@@ -1,7 +1,8 @@
 # User Settings
 acore_soap_app.egg-info/
 tmp/
-
+*.drawio.bkp
+*.drawio.dtmp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
