@@ -60,6 +60,10 @@ class SoapResponse:
     def to_json(self) -> str:  # pragma: no cover
         return json.dumps(self.to_dict())
 
+    @classmethod
+    def from_json(cls, json_str: str) -> "SoapResponse":  # pragma: no cover
+        return cls(**json.loads(json_str))
+
 
 def run_soap_command(
     command: str,
