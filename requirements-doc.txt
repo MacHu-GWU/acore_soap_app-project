@@ -1,0 +1,14 @@
+# This requirements file should only include dependencies for documentations
+# sphinx doc builder
+sphinx==5.3.0
+
+# Extensions
+sphinx-jinja==2.0.2                     # allow jinja2 template
+sphinx-copybutton==0.5.1                # add copy to clipboard button for code block
+rstobj==1.2.1                           # generate list table from data
+
+# docfly                                # auto API manual, auto Table of Content
+docfly==1.1.1                           # sphinx-doc automation
+
+# Theme
+furo==2023.03.27                         # modern doc theme
