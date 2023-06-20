@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema" xmlns:ns1="urn:AC"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Client</faultcode><faultstring>### USAGE: .account ...&#xD;
+Possible subcommands:&#xD;
+|- account create&#xD;
+|- account delete&#xD;
+|- account lock ...&#xD;
+|- account onlinelist&#xD;
+|- account remove ...&#xD;
+|- account set ...&#xD;
+</faultstring><detail>### USAGE: .account ...
+Possible subcommands:
+|- account create
+|- account delete
+|- account lock ...
+|- account onlinelist
+|- account remove ...
+|- account set ...
+</detail></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
