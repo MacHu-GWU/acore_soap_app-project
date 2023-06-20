@@ -183,6 +183,11 @@ if __name__ == "__main__":
         license=LICENSE,
         install_requires=REQUIRES,
         extras_require=EXTRA_REQUIRE,
+        entry_points={
+            "console_scripts": [
+                "acsoap=acore_soap_app.cli.main:run",
+            ],
+        },
     )
 
 """
