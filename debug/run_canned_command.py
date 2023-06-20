@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+这个模块用来测试运行封装好的命令.
+"""
+
 from boto_session_manager import BotoSesManager
 from acore_soap_app.sdk import canned
 
