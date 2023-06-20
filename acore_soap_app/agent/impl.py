@@ -38,6 +38,7 @@ def run_soap_command(
     xml = path_xml.read_text(encoding="utf-8").format(command=command)
     # send the request
     res = requests.post(url, headers=headers, data=xml)
+    print(res.text)
     # parse response
     root = ET.fromstring(res.text)
     results = list(root.iter("result"))
