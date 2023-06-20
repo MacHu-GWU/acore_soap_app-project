@@ -4,7 +4,7 @@
 todo: add docstring
 """
 
-import typing as T
+import json
 import dataclasses
 import xml.etree.ElementTree as ET
 
@@ -53,6 +53,12 @@ class SoapResponse:
             )
 
         raise ValueError("Cannot parse the response")
+
+    def to_dict(self) -> dict:  # pragma: no cover
+        return dataclasses.asdict(self)
+
+    def to_json(self) -> str:  # pragma: no cover
+        return json.dumps(self.to_dict())
 
 
 def run_soap_command(
