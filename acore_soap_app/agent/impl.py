@@ -40,15 +40,15 @@ class SoapResponse:
         results = list(root.iter("result"))
         if len(results):
             return cls(
-                body=body,
-                message=results[0].text,
+                body=body.strip(),
+                message=results[0].text.strip(),
                 succeeded=True,
             )
         faultstrings = list(root.iter("faultstring"))
         if len(faultstrings):
             return cls(
-                body=body,
-                message=faultstrings[0].text,
+                body=body.strip(),
+                message=faultstrings[0].text.strip(),
                 succeeded=False,
             )
 
