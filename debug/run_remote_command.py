@@ -20,6 +20,6 @@ command = [
 command_id = run_soap_command(
     bsm=bsm,
     server_id=server_id,
-    command=command,
+    cmd=command,
     sync=False,
 )

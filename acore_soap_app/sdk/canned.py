@@ -26,7 +26,7 @@ def get_online_players(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=".server info",
+        cmd=".server info",
     )
 
     res = re.findall("Connected players: (\d+)", soap_res.message)
@@ -67,7 +67,7 @@ def create_account(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=f".account create {username} {password}",
+        cmd=f".account create {username} {password}",
     )
     soap_res.print()
     return soap_res.succeeded
@@ -90,7 +90,7 @@ def set_gm_level(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=f".account set gmlevel {username} {level} {realm_id}",
+        cmd=f".account set gmlevel {username} {level} {realm_id}",
     )
     soap_res.print()
     return soap_res.succeeded
@@ -112,7 +112,7 @@ def set_password(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=f".account set password {username} {password} {password}",
+        cmd=f".account set password {username} {password} {password}",
     )
     soap_res.print()
     return soap_res.succeeded
@@ -129,7 +129,7 @@ def delete_account(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=f".account delete {username}",
+        cmd=f".account delete {username}",
     )
     soap_res.print()
     return soap_res.succeeded
@@ -145,7 +145,7 @@ def gm_list(
     soap_res = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        command=f".gm list",
+        cmd=f".gm list",
     )
     print(soap_res.message)
     if soap_res.succeeded:

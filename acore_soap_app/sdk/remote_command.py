@@ -11,25 +11,39 @@ from ..agent.api import SoapResponse
 from ..exc import EC2IsNotRunningError, RunCommandError
 
 
-def build_cli_arg(command: str) -> str:
-    return (
-        f'/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap gm "{command}"'
-    )
+def build_cli_arg(
+    cmd: str,
+    username: T.Optional[str] = None,
+    password: T.Optional[str] = None,
+) -> str:
+    args = [
+        "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
+        "gm",
+        "--cmd",
+        f"\"{cmd}\"",
+    ]
+    if username is not None:
+        args.extend(["--username", username])
+    if password is not None:
+        args.extend(["--password", password])
+    return " ".join(args)
 
 
 def run_soap_command(
     bsm: BotoSesManager,
     server_id: str,
-    command: T.Union[str, T.List[str]],
+    cmd: T.Union[str, T.List[str]],
+    username: T.Optional[str] = None,
+    password: T.Optional[str] = None,
     sync: bool = True,
     delays: int = 1,
     timeout: int = 10,
     verbose: bool = True,
-) -> T.Union[SoapResponse, str,]:
+) -> T.Union[SoapResponse, str]:
     """
     :param bsm:
     :param server_id:
-    :param command: single or list of command you want to execute
+    :param cmd: single or list of command you want to execute
     :param sync: if sync mode, then return a :class:`acore_soap_app.agent.impl.SoapResponse`
         object, if async mode, then return a command id.
     :param delays:
@@ -37,10 +51,10 @@ def run_soap_command(
     :param verbose:
     """
     # preprocess arguments
-    if isinstance(command, str):
-        commands = [command]
+    if isinstance(cmd, str):
+        commands = [cmd]
     else:
-        commands = command
+        commands = cmd
 
     # get ec2 instance id
     server = Server(id=server_id)
@@ -53,7 +67,13 @@ def run_soap_command(
     command_id = aws_ssm_run_command.better_boto.send_command(
         ssm_client=bsm.ssm_client,
         instance_id=instance_id,
-        commands=[build_cli_arg(command) for command in commands],
+        commands=[
+            build_cli_arg(
+                cmd=command,
+                username=username,
+                password=password,
+            ) for command in commands
+        ],
     )
     if sync is False:
         return command_id
