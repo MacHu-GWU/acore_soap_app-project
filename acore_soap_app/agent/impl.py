@@ -9,7 +9,9 @@ import dataclasses
 import xml.etree.ElementTree as ET
 
 import requests
+
 from ..paths import dir_python_lib
+from ..exc import SoapResponseParseError
 
 path_xml = dir_python_lib.joinpath("agent", "execute-command.xml")
 execute_command_xml = path_xml.read_text(encoding="utf-8")
@@ -52,7 +54,7 @@ class SoapResponse:
                 succeeded=False,
             )
 
-        raise ValueError("Cannot parse the response")
+        raise SoapResponseParseError(f"Cannot parse the response: {body!r}")
 
     def to_dict(self) -> dict:  # pragma: no cover
         return dataclasses.asdict(self)
