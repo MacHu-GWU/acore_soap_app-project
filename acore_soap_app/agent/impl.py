@@ -66,6 +66,9 @@ class SoapResponse:
     def from_json(cls, json_str: str) -> "SoapResponse":  # pragma: no cover
         return cls(**json.loads(json_str))
 
+    def print(self):
+        print({"succeeded": self.succeeded, "message": self.message})
+
 
 def run_soap_command(
     command: str,

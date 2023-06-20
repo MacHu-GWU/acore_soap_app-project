@@ -8,14 +8,18 @@ if T.TYPE_CHECKING:
 
 
 class EC2IsNotRunningError(SystemError):
-    pass
+    """
+    raises when try to run a remote command on a non-running EC2 instance.
+    """
 
-
-class SoapResponseParseError(ValueError):
     pass
 
 
 class RunCommandError(SystemError):
+    """
+    raises when ssm_client.send_command() fails.
+    """
+
     @classmethod
     def from_command_invocation(
         cls,
@@ -27,3 +31,13 @@ class RunCommandError(SystemError):
             f"error: {command_invocation.StandardErrorContent!r}, "
         )
         return cls(msg)
+
+
+class SoapResponseParseError(ValueError):
+    """
+    raises when failed to parse the soap response.
+    """
+
+
+class SoapCommandFailedError(ValueError):
+    pass
