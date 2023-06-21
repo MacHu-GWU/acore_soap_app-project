@@ -1,4 +1,4 @@
-Agent vs SDK
+Agent and SDK
 ==============================================================================
 
 
@@ -13,9 +13,20 @@ SDK 则是一套开发者工具. 它对用 Run Command Service 远程执行 CLI 
 
 Agent
 ------------------------------------------------------------------------------
-
-
+:class:`~acore_soap_app.cli.main.Command` 定义了 SOAP Agent CLI 的命令和参数.
 
 
 SDK
 ------------------------------------------------------------------------------
+下面这个例子展示了如何用 :func:`~acore_soap_app.sdk.core.run_soap_command` 函数来在任何地方远程执行 GM 命令.
+
+.. literalinclude:: ../../../examples/run_soap_command.py
+   :language: python
+   :linenos:
+
+:mod:`~acore_soap_app.sdk.core.canned` 模块 还提供了许多对具体的 GM 命令业务逻辑高度封装后的接口. 更加的 Pythonic.
+
+.. literalinclude:: ../../../examples/run_canned_command.py
+   :language: python
+   :linenos:
+

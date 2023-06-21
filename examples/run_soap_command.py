@@ -8,5 +8,6 @@ from acore_soap_app.agent.api import SOAPRequest
 
 command = "server info"
 # command = ".account onlinelist"
+
 response = SOAPRequest(command=command).send()
 response.print()

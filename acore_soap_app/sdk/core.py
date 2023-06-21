@@ -13,7 +13,6 @@ from acore_server_metadata.api import Server
 
 from ..agent.api import SOAPRequest, SOAPResponse
 from ..exc import EC2IsNotRunningError, RunCommandError
-from ..utils import get_object, put_object
 
 
 def build_cli_arg_for_gm(
@@ -24,6 +23,9 @@ def build_cli_arg_for_gm(
     s3uri_output: T.Optional[str] = None,
     path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
 ) -> str:
+    """
+    构造最终的命令行参数.
+    """
     args = [
         path_cli,
         "gm",
@@ -66,7 +68,14 @@ def run_soap_command(
     """
     从任何地方, 通过 SSM Run Command, 远程执行 SOAP 命令.
 
-    :param bsm:
+    Usage Example:
+
+    .. code-block:: python
+
+        >>> response = run_soap_command(bsm, "sbx-blue", ".server info")
+        >>> response = run_soap_command(bsm, "sbx-blue", [".account create test1 test1", ".account create test2 test2"])
+
+    :param bsm: ``boto_session_manager.BotoSesManager`` 对象, 定义了 AWS 权限.
     :param server_id: AzerothCore 服务器的逻辑 ID, 命名规律为 "${env_name}-${server_name}",
         例如 "sbx-blue"
     :param request_like: 请参考

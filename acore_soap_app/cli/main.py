@@ -43,13 +43,13 @@ class Command:
 
         Example::
 
-        - acsoap gm --help
+            acsoap gm --help
 
-        - acsoap gm ".server info"
+            acsoap gm ".server info"
 
-        - acsoap gm ".server info" --user myuser --pwd mypwd
+            acsoap gm ".server info" --user myuser --pwd mypwd
 
-        - acsoap gm ".server info" --s3uri s3://bucket/output.json
+            acsoap gm ".server info" --s3uri s3://bucket/output.json
         """
         gm(
             request_like=cmd,

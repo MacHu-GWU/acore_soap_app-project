@@ -35,6 +35,9 @@ DEFAULT_PORT = 7878
 
 @dataclasses.dataclass
 class Base:
+    """
+    Base class for :class:`SOAPRequest` and :class:`SOAPResponse`.
+    """
     @classmethod
     def from_dict(cls, dct: dict):
         """
@@ -102,8 +105,8 @@ class SOAPRequest(Base):
         >>> response = request.send()
         >>> response.to_json()
         {
-            "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/1999/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/1999/XMLSchema\" xmlns:ns1=\"urn:AC\"><SOAP-ENV:Body><ns1:executeCommandResponse><result>AzerothCore rev. 85311fa55983 2023-03-25 22:36:05 +0000 (master branch) (Unix, RelWithDebInfo, Static)&#xD;\nConnected players: 0. Characters in world: 0.&#xD;\nConnection peak: 0.&#xD;\nServer uptime: 54 minute(s) 3 second(s)&#xD;\nUpdate time diff: 10ms, average: 10ms.&#xD;\n</result></ns1:executeCommandResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>",
-            "message": "AzerothCore rev. 85311fa55983 2023-03-25 22:36:05 +0000 (master branch) (Unix, RelWithDebInfo, Static)\r\nConnected players: 0. Characters in world: 0.\r\nConnection peak: 0.\r\nServer uptime: 54 minute(s) 3 second(s)\r\nUpdate time diff: 10ms, average: 10ms.",
+            "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/1999/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/1999/XMLSchema\" xmlns:ns1=\"urn:AC\"><SOAP-ENV:Body><ns1:executeCommandResponse><result>AzerothCore rev. 85311fa55983 2023-03-25 22:36:05 +0000 (master branch) (Unix, RelWithDebInfo, Static)&#xD;Connected players: 0. Characters in world: 0.&#xD;Connection peak: 0.&#xD;Server uptime: 54 minute(s) 3 second(s)&#xD;Update time diff: 10ms, average: 10ms.&#xD;</result></ns1:executeCommandResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>",
+            "message": "AzerothCore rev. 85311fa55983 2023-03-25 22:36:05 +0000 (master branch) (Unix, RelWithDebInfo, Static)Connected players: 0. Characters in world: 0.Connection peak: 0.Server uptime: 54 minute(s) 3 second(s)Update time diff: 10ms, average: 10ms.",
             "succeeded": true
         }
 
@@ -112,6 +115,15 @@ class SOAPRequest(Base):
     :param password: the in game GM account password, default "admin".
     :param host: wow world server host, default "localhost".
     :param port: wow world server SOAP port, default 7878.
+
+    More methods from base class:
+
+    - :meth:`~Base.from_dict`
+    - :meth:`~Base.to_dict`
+    - :meth:`~Base.from_json`
+    - :meth:`~Base.to_json`
+    - :meth:`~Base.batch_load_from_s3`
+    - :meth:`~Base.batch_dump_to_s3`
     """
 
     command: str = dataclasses.field()
@@ -250,6 +262,15 @@ class SOAPResponse(Base):
     :param message: if succeeded, it is the ``<result>...</result>`` part.
         if failed, it is the ``<faultstring>...</faultstring>`` part
     :param succeeded: a boolean flag to indicate whether the command is succeeded
+
+    More methods from base class:
+
+    - :meth:`~Base.from_dict`
+    - :meth:`~Base.to_dict`
+    - :meth:`~Base.from_json`
+    - :meth:`~Base.to_json`
+    - :meth:`~Base.batch_load_from_s3`
+    - :meth:`~Base.batch_dump_to_s3`
     """
 
     body: str = dataclasses.field()
