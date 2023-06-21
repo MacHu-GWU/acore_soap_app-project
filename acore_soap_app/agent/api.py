@@ -4,6 +4,6 @@
 agent module public API.
 """
 
-from .impl import SoapResponse
-from .impl import run_soap_command
+from .impl import SOAPRequest
+from .impl import SOAPResponse
 from .impl import get_boto_ses
