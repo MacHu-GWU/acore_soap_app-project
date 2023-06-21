@@ -113,7 +113,7 @@ class SOAPRequest(Base):
 
 
 @dataclasses.dataclass
-class SOAPResponse:
+class SOAPResponse(Base):
     """
     :class:`~acore_soap_app.agent.impl.SOAPResponse` is a dataclass to represent
     the SOAP XML response.
