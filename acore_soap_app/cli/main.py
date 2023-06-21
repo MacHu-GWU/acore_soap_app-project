@@ -5,8 +5,15 @@ import json
 import fire
 from boto_session_manager import BotoSesManager
 
-from ..agent.api import run_soap_command as run_local_soap_command, get_boto_ses
-from ..sdk.api import run_soap_command as run_remote_soap_command
+from .impl import (
+    gm,
+    batch_gm,
+)
+from ..agent.api import (
+    SOAPRequest,
+    SOAPResponse,
+    get_boto_ses,
+)
 
 
 def ensure_ec2_environment():
@@ -16,73 +23,90 @@ def ensure_ec2_environment():
 
 class Command:
     # --------------------------------------------------------------------------
-    #
+    # These two command can only be used on EC2
     # --------------------------------------------------------------------------
     def gm(
         self,
         cmd: str,
-        username: str = "admin",
-        password: str = "admin",
+        user: T.Optional[str] = None,
+        pwd: T.Optional[str] = None,
+        s3uri: T.Optional[str] = None,
     ):
         """
-        Example: acsoap gm ".server info"
-        """
-        ensure_ec2_environment()
-        soap_res = run_local_soap_command(
-            command=cmd, username=username, password=password
-        )
-        print(soap_res.to_json())
+        Run single GM command.
 
-    def s3_gm(
-        self,
-        s3uri_input: str,
-        s3uri_output: str,
-    ):
-        ensure_ec2_environment()
-        boto_ses = get_boto_ses()
-        s3_client = boto_ses.client("s3")
-        parts = s3uri_input.split("/", 3)
-        bucket, key = parts[2], parts[3]
-        get_object_response = s3_client.get_object(Bucket=bucket, Key=key)
-        records: T.List[T.Dict[str, str]] = json.loads(
-            get_object_response["Body"].read().decode("utf-8")
-        )
-        results: T.List[T.Dict[str, str]] = [
-            run_local_soap_command(**record).to_dict() for record in records
-        ]
-        parts = s3uri_output.split("/", 3)
-        bucket, key = parts[2], parts[3]
-        s3_client.put_object(Bucket=bucket, Key=key, Body=json.dumps(results))
-        print(f"results saved to {s3uri_output}")
+        :param cmd: the GM command to run
+        :param user: in game GM account username, if not given, then use "admin"
+        :param pwd: in game GM account password, if not given, then use "admin"
+        :param s3uri: if None, then return the response as JSON, otherwise, save
+            the response to S3.
 
-    def remote_gm(
+        Example:
+
+        - acsoap gm ".server info"
+        - acsoap gm s3://bucket/request.json
+        """
+        if cmd.startswith("s3://"):
+            request = cmd
+        else:
+            request = SOAPRequest(command=cmd, username=user, password=pwd)
+        gm(request=request, username=user, password=pwd, s3uri_output=s3uri)
+
+    def batch_gm(
         self,
-        server_id: str,
-        cmd: str,
-        username: str = "admin",
-        password: str = "admin",
-        region: T.Optional[str] = None,
-        profile: T.Optional[str] = None,
-        delays: int = 1,
-        timeout: int = 10,
-        verbose: bool = True,
+        s3uri_in: str,
+        user: T.Optional[str] = None,
+        pwd: T.Optional[str] = None,
+        raises: bool = True,
+        s3uri_out: T.Optional[str] = None,
     ):
         """
-        Example: acsoap gm ".server info"
+        Run sequence of GM commands.
+
+        :param s3uri_in: the S3 URI of the JSON file that contains the soap requests,
+            example: ``[{"command": ".account create test1 ..."}, {"command": ".account create test2 ..."}]``
+        :param user: in game GM account username, if not given, then use "admin"
+        :param pwd: in game GM account password, if not given, then use "admin"
+        :param raises: raise error if any of the GM command failed.
+        :param s3uri_out: if None, then return the response as JSON, otherwise, save
+            the response to S3.
         """
-        bsm = BotoSesManager(region_name=region, profile_name=profile)
-        soap_res = run_remote_soap_command(
-            bsm=bsm,
-            server_id=server_id,
-            cmd=cmd,
-            username=username,
-            password=password,
-            sync=True,
-            delays=delays,
-            timeout=timeout,
-            verbose=verbose,
+        batch_gm(
+            requests=s3uri_in,
+            username=user,
+            password=pwd,
+            stop_on_error=raises,
+            s3uri_output=s3uri_out,
         )
-        print(soap_res.to_json())
+
+    # def remote_gm(
+    #     self,
+    #     server_id: str,
+    #     cmd: str,
+    #     username: str = "admin",
+    #     password: str = "admin",
+    #     region: T.Optional[str] = None,
+    #     profile: T.Optional[str] = None,
+    #     delays: int = 1,
+    #     timeout: int = 10,
+    #     verbose: bool = True,
+    # ):
+    #     """
+    #     Example: acsoap gm ".server info"
+    #     """
+    #     bsm = BotoSesManager(region_name=region, profile_name=profile)
+    #     soap_res = run_remote_soap_command(
+    #         bsm=bsm,
+    #         server_id=server_id,
+    #         cmd=cmd,
+    #         username=username,
+    #         password=password,
+    #         sync=True,
+    #         delays=delays,
+    #         timeout=timeout,
+    #         verbose=verbose,
+    #     )
+    #     print(soap_res.to_json())
 
 
 def run():

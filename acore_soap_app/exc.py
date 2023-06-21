@@ -33,11 +33,13 @@ class RunCommandError(SystemError):
         return cls(msg)
 
 
-class SoapResponseParseError(ValueError):
+class SOAPResponseParseError(ValueError):
     """
     raises when failed to parse the soap response.
     """
 
 
-class SoapCommandFailedError(ValueError):
-    pass
+class SOAPCommandFailedError(ValueError):
+    """
+    raises when SOAP command failed
+    """
