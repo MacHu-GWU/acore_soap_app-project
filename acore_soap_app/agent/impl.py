@@ -7,6 +7,8 @@ todo: add docstring
 import typing as T
 import json
 import dataclasses
+from pathlib import Path
+from datetime import datetime
 import xml.etree.ElementTree as ET
 
 import boto3
@@ -62,21 +64,24 @@ class Base:
     @classmethod
     def batch_load_from_s3(
         cls,
-        s3uri: str,
         s3_client,
+        s3uri: str,
     ) -> T.List["Base"]:
+        """
+        从 S3 中加载多个对象.
+        """
         json_str = get_object(s3_client, s3uri=s3uri)
         return [cls.from_dict(dct) for dct in json.loads(json_str)]
 
     @classmethod
     def batch_dump_to_s3(
         cls,
+        s3_client,
         instances: T.Iterable,
         s3uri: str,
-        s3_client,
     ):
         """
-        将多个 :class:`SOAPRequest` 以 JSON 格式保存到 S3 中.
+        将多个对象以 JSON 格式保存到 S3 中.
         """
         data = [instance.to_dict() for instance in instances]
         put_object(s3_client=s3_client, s3uri=s3uri, body=json.dumps(data))
@@ -161,9 +166,9 @@ class SOAPRequest(Base):
             "SOAPRequest",
             T.List["SOAPRequest"],
         ],
-        s3_client=None,
         username: T.Optional[str] = None,
         password: T.Optional[str] = None,
+        s3_client=None,
     ) -> T.List["SOAPRequest"]:
         """
         从各种形式的输入中加载 :class:`SOAPRequest`. 该方法总是返回一个列表.
@@ -171,13 +176,19 @@ class SOAPRequest(Base):
         输入参数 ``request_like`` 代表着要运行的 GM 命令, 它可能是以下几种形式中的一种:
 
         - 如果是一个字符串:
-            - 如果是以 s3:// 开头, 那么就去 S3 读数据, 此时需要给定 ``s3_client`` 参数:
+            - 如果是以 s3:// 开头, 那么就去 S3 读数据, 此时需要给定 ``s3_client`` 参数.
+                通常用于 payload 比较大的情况:
                 - 如果读到的数据是单个字典, 那么就视为一个 SOAPRequest.
                 - 如果读到的数据是一个列表, 那么就视为多个 SOAPRequest.
             - 如果不是以 s3:// 开头, 那么就视为一个 GM command.
         - 如果是一个字符串列表, 那么就视为多个 GM 命令.
         - 它还可以是单个 SOAPRequest 或 SOAPRequest 列表.
         - 这个参数最终都会被转换成 SOAPRequest 的列表.
+
+        :param request_like: 上面已经说过了.
+        :param username: 默认的用户名, 只有当 request.username 为 None 的时候才会用到.
+        :param password: 默认的密码, 只有当 request.password 为 None 的时候才会用到.
+        :param s3_client: boto3.client("s3")
         """
         if isinstance(request_like, str):
             if request_like.startswith("s3://"):  # pragma: no cover
@@ -278,6 +289,25 @@ class SOAPResponse(Base):
 # ------------------------------------------------------------------------------
 # Create boto3 session on EC2
 # ------------------------------------------------------------------------------
+path_aws_region_cache = Path.home().joinpath(".aws_region_cache.json")
+
+
+def _dump_aws_region_cache(region: str):  # pragma: no cover
+    path_aws_region_cache.write_text(
+        json.dumps({"region": region, "timestamp": int(datetime.utcnow().timestamp())})
+    )
+
+
+def _load_aws_region_cache() -> T.Optional[str]:  # pragma: no cover
+    if not path_aws_region_cache.exists():
+        return None
+    data = json.loads(path_aws_region_cache.read_text())
+    if (datetime.utcnow().timestamp() - data["timestamp"]) > 86400:  # cache expired
+        return None
+    else:
+        return data["region"]
+
+
 def get_ec2_metadata(name: str) -> str:  # pragma: no cover
     """
     Get the EC2 instance id from the AWS EC2 metadata API.
@@ -291,7 +321,11 @@ def get_ec2_metadata(name: str) -> str:  # pragma: no cover
 
 
 def get_ec2_region() -> str:  # pragma: no cover
-    return get_ec2_metadata("placement/region")
+    region = _load_aws_region_cache()
+    if region is None:
+        region = get_ec2_metadata("placement/region")
+        _dump_aws_region_cache(region)
+    return region
 
 
 def get_boto_ses() -> boto3.session.Session:  # pragma: no cover

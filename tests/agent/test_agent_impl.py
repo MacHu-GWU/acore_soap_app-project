@@ -64,17 +64,17 @@ class TestSOAPRequest(BaseMockTest):
             SOAPRequest(command="command2"),
         ]
         SOAPRequest.batch_dump_to_s3(
-            requests,
-            s3uri="s3://mybucket/requests.json",
             s3_client=self.bsm.s3_client,
+            instances=requests,
+            s3uri="s3://mybucket/requests.json",
         )
 
         json_str = get_object(self.bsm.s3_client, s3uri="s3://mybucket/requests.json")
         assert "username" not in json_str
 
         requests1 = SOAPRequest.batch_load_from_s3(
-            s3uri="s3://mybucket/requests.json",
             s3_client=self.bsm.s3_client,
+            s3uri="s3://mybucket/requests.json",
         )
         assert requests1 == requests
 
@@ -82,7 +82,8 @@ class TestSOAPRequest(BaseMockTest):
         SOAPRequest.batch_load("command")
         SOAPRequest.batch_load(["command1", "command2"])
         SOAPRequest.batch_load(
-            "s3://mybucket/requests.json", s3_client=self.bsm.s3_client
+            "s3://mybucket/requests.json",
+            s3_client=self.bsm.s3_client,
         )
         SOAPRequest.batch_load(SOAPRequest("command"))
         SOAPRequest.batch_load([SOAPRequest("command1"), SOAPRequest("command2")])
