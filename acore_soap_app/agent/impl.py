@@ -66,7 +66,7 @@ class Base:
         cls,
         s3_client,
         s3uri: str,
-    ) -> T.List["Base"]:
+    ):
         """
         从 S3 中加载多个对象.
         """

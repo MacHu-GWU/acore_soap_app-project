@@ -17,17 +17,17 @@ from ..utils import get_object, put_object
 
 
 def build_cli_arg_for_gm(
-    cmd: str,
+    command: str,
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
     raises: T.Optional[bool] = True,
-    s3uri: T.Optional[str] = None,
+    s3uri_output: T.Optional[str] = None,
     path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
 ) -> str:
     args = [
         path_cli,
         "gm",
-        f'"{cmd}"',
+        f'"{command}"',
     ]
     if username is not None:
         args.append(f"-u={username}")
@@ -38,42 +38,15 @@ def build_cli_arg_for_gm(
             args.append(f"-r=True")
         else:
             args.append(f"-r=False")
-    if s3uri is not None:
-        args.append(f"-s={s3uri}")
-    return " ".join(args)
-
-
-def build_cli_arg_for_batch_gm(
-    s3uri_in: str,
-    username: T.Optional[str] = None,
-    password: T.Optional[str] = None,
-    raises: T.Optional[bool] = True,
-    s3uri_out: T.Optional[str] = None,
-    path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
-) -> str:
-    args = [
-        path_cli,
-        "batch-gm",
-        f'"{s3uri_in}"',
-    ]
-    if username is not None:
-        args.append(f"-u={username}")
-    if password is not None:
-        args.append(f"-p={password}")
-    if raises is not None:
-        if raises:
-            args.append(f"-r=True")
-        else:
-            args.append(f"-r=False")
-    if s3uri_out is not None:
-        args.append(f"-s={s3uri_out}")
+    if s3uri_output is not None:
+        args.append(f"-s={s3uri_output}")
     return " ".join(args)
 
 
 def run_soap_command(
     bsm: BotoSesManager,
     server_id: str,
-    request: T.Union[
+    request_like: T.Union[
         str,
         T.List[str],
         SOAPRequest,
@@ -82,7 +55,9 @@ def run_soap_command(
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
     raises: T.Optional[bool] = True,
-    s3uri_out: T.Optional[str] = None,
+    s3uri_input: T.Optional[str] = None,
+    s3uri_output: T.Optional[str] = None,
+    path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
     sync: bool = True,
     delays: int = 1,
     timeout: int = 10,
@@ -93,18 +68,14 @@ def run_soap_command(
 
     :param bsm:
     :param server_id:
-    :param request: 代表着要运行的 GM 命令, 它可能是以下几种形式中的一种.
-        - 如果是一个字符串:
-            - 如果是以 s3:// 开头, 那么就去 S3 读数据:
-                - 如果读到的数据是单个字典, 那么就视为一个 SOAPRequest.
-                - 如果读到的数据是一个列表, 那么就视为多个 SOAPRequest.
-            - 如果不是以 s3:// 开头, 那么就视为一个 GM command.
-        - 如果是一个字符串列表, 那么就视为多个 GM 命令.
-        - 它还可以是单个 SOAPRequest 或 SOAPRequest 列表.
-        - 这个参数最终都会被转换成 SOAPRequest 的列表.
-    :param raises: 在运行一系列命令时, 如果出错时是否抛出异常, 还是说将
-        failed SOAP XML response 原封不动的返回.
-    :param s3uri_out: 如果不指定, 则默认将输出作为 JSON 打印. 如果指定了 s3uri,
+    :param request_like: 请参考
+        :class:`~acore_soap_app.agent.impl.SOAPRequest.batch_load`
+    :param username: 默认的用户名, 只有当 request.username 为 None 的时候才会用到.
+    :param password: 默认的密码, 只有当 request.password 为 None 的时候才会用到.
+    :param raises: 默认为 True. 如果为 True, 则在遇到错误时抛出异常. 反之则将
+        failed SOAP Response 原封不动地返回.
+    :param s3uri_input:
+    :param s3uri_output: 如果不指定, 则默认将输出作为 JSON 打印. 如果指定了 s3uri,
         则将输出写入到 S3.
     :param sync: 同步和异步模式
         - 如果以同步模式运行, 则会等待 SSM Run Command 完成
@@ -113,32 +84,13 @@ def run_soap_command(
     :param timeout: 同步模式下的超时限制
     :param verbose: 同步模式下是否显示进度条
     """
-    # preprocess arguments
-    if isinstance(request, str):
-        if request.startswith("s3://"):
-            data = get_object(s3_client=bsm.s3_client, s3uri=request)
-            if isinstance(data, dict):
-                requests = [SOAPRequest.from_dict(data)]
-            elif isinstance(data, list):
-                requests = [SOAPRequest.from_dict(dct) for dct in data]
-            else:  # pragma: no cover
-                raise TypeError
-        else:
-            requests = [SOAPRequest(command=request)]
-    elif isinstance(request, SOAPRequest):
-        requests = [request]
-    elif isinstance(request, list):
-        if isinstance(request[0], str):
-            requests = [SOAPRequest(command=item) for item in request]
-        elif isinstance(request[0], SOAPRequest):
-            requests = request
-        else:
-            raise TypeError
-    else:  # pragma: no cover
-        raise TypeError(f"request must be str or SOAPRequest, not {type(request)}")
-
-    for request_ in requests:
-        request_.set_default(username=username, password=password)
+    # load requests
+    requests = SOAPRequest.batch_load(
+        request_like=request_like,
+        username=username,
+        password=password,
+        s3_client=bsm.s3_client,
+    )
 
     # get ec2 instance id
     server = Server(id=server_id)
@@ -147,22 +99,55 @@ def run_soap_command(
         raise EC2IsNotRunningError(f"EC2 {server_id!r} is not running")
     instance_id = server.ec2_inst.id
 
+    # identify the run strategy
+    if len(requests) >= 20:
+        if s3uri_input is None:
+            raise ValueError(
+                "'s3uri_input' must be specified when the number of requests is greater than 20"
+            )
+        is_s3_input = True
+    else:
+        is_s3_input = s3uri_input is not None
+
+    if is_s3_input:
+        SOAPRequest.batch_dump_to_s3(
+            s3_client=bsm.s3_client,
+            instances=requests,
+            s3uri=s3uri_input,
+        )
+        commands = [
+            build_cli_arg_for_gm(
+                command=s3uri_input,
+                username=username,
+                password=password,
+                raises=raises,
+                s3uri_output=s3uri_output,
+                path_cli=path_cli,
+            )
+        ]
+    else:
+        commands = [
+            build_cli_arg_for_gm(
+                command=request.command,
+                username=request.username,
+                password=request.password,
+                raises=raises,
+                s3uri_output=s3uri_output,
+                path_cli=path_cli,
+            )
+            for request in requests
+        ]
+
     # run command
     command_id = aws_ssm_run_command.better_boto.send_command(
         ssm_client=bsm.ssm_client,
         instance_id=instance_id,
-        commands=[
-            build_cli_arg(
-                cmd=command,
-                username=username,
-                password=password,
-            )
-            for command in commands
-        ],
+        commands=commands,
     )
-    if sync is False:
+    if sync is False:  # async mode, return immediately
         return command_id
 
+    # sync mode, wait until command succeeded
     time.sleep(1)
 
     # get command response
@@ -179,19 +164,12 @@ def run_soap_command(
         raise RunCommandError.from_command_invocation(command_invocation)
 
     # parse response
-    output = command_invocation.StandardOutputContent
-    soap_response = SOAPResponse.from_json(output)
-    return soap_response
-
-
-# def run_bulk_soap_command(
-#     bsm: BotoSesManager,
-#     server_id: str,
-#     cmd: T.Union[str, T.List[str]],
-#     username: T.Optional[str] = None,
-#     password: T.Optional[str] = None,
-#     sync: bool = True,
-#     delays: int = 1,
-#     timeout: int = 10,
-#     verbose: bool = True,
-# ) -> T.Union[SoapResponse, str]:
+    if s3uri_output is None:
+        output = command_invocation.StandardOutputContent
+        lines = output.splitlines()
+        responses = [SOAPResponse.from_json(json_str) for json_str in lines]
+    else:
+        responses = SOAPResponse.batch_load_from_s3(
+            s3_client=bsm.s3_client, s3uri=s3uri_output
+        )
+    return responses
