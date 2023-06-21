@@ -5,6 +5,7 @@ import json
 
 from ..agent.api import SOAPRequest, SOAPResponse, get_boto_ses
 from ..exc import SOAPCommandFailedError
+from ..utils import get_object, put_object
 
 
 def ensure_ec2_environment():
@@ -15,37 +16,25 @@ def ensure_ec2_environment():
 def ensure_response_succeeded(
     request: SOAPRequest,
     response: SOAPResponse,
+    raises: bool,
 ) -> SOAPResponse:
     if response.succeeded:
         return response
     else:
-        raise SOAPCommandFailedError(
-            f"request failed: {request.command!r}, " f"response: {response.message!r}"
-        )
-
-
-def get_object(s3_client, s3uri: str) -> str:
-    parts = s3uri.split("/", 3)
-    bucket, key = parts[2], parts[3]
-    response = s3_client.get_object(Bucket=bucket, Key=key)
-    return response["Body"].read().decode("utf-8")
-
-
-def put_object(s3_client, s3uri: str, body: str):
-    parts = s3uri.split("/", 3)
-    bucket, key = parts[2], parts[3]
-    return s3_client.put_object(
-        Bucket=bucket,
-        Key=key,
-        Body=body,
-        ContentType="application/json",
-    )
+        if raises:
+            raise SOAPCommandFailedError(
+                f"request failed: {request.command!r}, "
+                f"response: {response.message!r}"
+            )
+        else:
+            return response
 
 
 def gm(
     request: T.Union[str, SOAPRequest],
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
+    raises: bool = True,
     s3uri_output: T.Optional[str] = None,
 ):
     """
@@ -56,6 +45,8 @@ def gm(
         对象数据. 常用于请求特别大的情况.
     :param username: 默认的用户名, 只有当 request.username 为 None 的时候才会用到.
     :param password: 默认的密码, 只有当 request.password 为 None 的时候才会用到.
+    :param raises: 默认为 True. 如果为 True, 则在遇到错误时抛出异常. 反之则将
+        failed SOAP Response 原封不动地返回.
     :param s3uri_output: 可选参数, 如果为 None, 则将
         :class:`~acore_soap_app.agent.impl.SOAPResponse` 对象转换为 JSON 并打印.
         如果给定, 则将 JSON 保存到 S3 中. 常用于返回结果特别大的情况.
@@ -68,13 +59,10 @@ def gm(
         boto_ses = get_boto_ses()
         s3_client = boto_ses.client("s3")
         request = SOAPRequest.from_json(get_object(s3_client, s3uri=request))
-    if request.username is None:
-        request.username = username
-    if request.password is None:
-        request.password = password
+    request.set_default(username=username, password=password)
 
     # run
-    response = request.send()
+    response = ensure_response_succeeded(request, request.send(), raises=raises)
 
     # handle output
     if s3uri_output is None:
@@ -90,7 +78,7 @@ def batch_gm(
     requests: T.Union[str, T.Iterable[SOAPRequest]],
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
-    stop_on_error: bool = True,
+    raises: bool = True,
     s3uri_output: T.Optional[str] = None,
 ):
     """
@@ -99,8 +87,8 @@ def batch_gm(
     :param requests: 一批 :class:`~acore_soap_app.agent.impl.SOAPRequest` 对象.
     :param username: 默认的用户名, 只有当 request.username 为 None 的时候才会用到.
     :param password: 默认的密码, 只有当 request.password 为 None 的时候才会用到.
-    :param stop_on_error: 默认为 True. 如果为 True, 则在遇到错误时提前停止运行并报错.
-        否则则一直运行.
+    :param raises: 默认为 True. 如果为 True, 则在遇到错误时抛出异常. 反之则将
+        failed SOAP Response 原封不动地返回.
     :param s3uri_output: 可选参数, 如果为 None, 则将
         :class:`~acore_soap_app.agent.impl.SOAPResponse` 对象转换为 JSON 并打印.
         如果给定, 则将 JSON 保存到 S3 中. 常用于返回结果特别大的情况.
@@ -115,19 +103,13 @@ def batch_gm(
         json_str = get_object(s3_client, s3uri=requests)
         requests = [SOAPRequest.from_dict(dct) for dct in json.loads(json_str)]
     for request in requests:
-        if request.username is None:
-            request.username = username
-        if request.password is None:
-            request.password = password
+        request.set_default(username=username, password=password)
 
     # run
-    responses: T.List[SOAPResponse]
-    if stop_on_error:
-        responses = [
-            ensure_response_succeeded(request, request.send()) for request in requests
-        ]
-    else:
-        responses = [request.send() for request in requests]
+    responses = [
+        ensure_response_succeeded(request, request.send(), raises)
+        for request in requests
+    ]
 
     # handle output
     if s3uri_output is None:
