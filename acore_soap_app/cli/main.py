@@ -30,6 +30,7 @@ class Command:
         cmd: str,
         user: T.Optional[str] = None,
         pwd: T.Optional[str] = None,
+        raises: bool = True,
         s3uri: T.Optional[str] = None,
     ):
         """
@@ -38,6 +39,7 @@ class Command:
         :param cmd: the GM command to run
         :param user: in game GM account username, if not given, then use "admin"
         :param pwd: in game GM account password, if not given, then use "admin"
+        :param raises: raise error if any of the GM command failed.
         :param s3uri: if None, then return the response as JSON, otherwise, save
             the response to S3.
 
@@ -50,13 +52,18 @@ class Command:
         - acsoap gm ".server info" --user myuser --pwd mypwd
 
         - acsoap gm ".server info" --s3uri s3://bucket/output.json
-
         """
         if cmd.startswith("s3://"):
             request = cmd
         else:
             request = SOAPRequest(command=cmd, username=user, password=pwd)
-        gm(request=request, username=user, password=pwd, s3uri_output=s3uri)
+        gm(
+            request=request,
+            username=user,
+            password=pwd,
+            raises=raises,
+            s3uri_output=s3uri,
+        )
 
     def batch_gm(
         self,
@@ -91,7 +98,7 @@ class Command:
             requests=s3uri_in,
             username=user,
             password=pwd,
-            stop_on_error=raises,
+            raises=raises,
             s3uri_output=s3uri_out,
         )
 
