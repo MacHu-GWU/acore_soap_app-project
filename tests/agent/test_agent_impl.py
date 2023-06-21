@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from acore_soap_app.agent.impl import SOAPRequest, SOAPResponse, SoapResponseParseError
+from acore_soap_app.agent.impl import SOAPRequest, SOAPResponse, SOAPResponseParseError
 
 
 dir_here = Path(__file__).absolute().parent
@@ -37,7 +37,7 @@ class TestSoapResponse:
         assert res.succeeded is True
         assert "Account created: test" in res.message
 
-        with pytest.raises(SoapResponseParseError):
+        with pytest.raises(SOAPResponseParseError):
             SOAPResponse.parse("<a>hello</a>")
 
 

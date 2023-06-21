@@ -13,7 +13,7 @@ import boto3
 import requests
 
 from ..paths import dir_python_lib
-from ..exc import SoapResponseParseError
+from ..exc import SOAPResponseParseError
 
 # ------------------------------------------------------------------------------
 # Soap Request and Response
@@ -23,10 +23,10 @@ path_xml = dir_python_lib.joinpath("agent", "execute-command.xml")
 # default soap request headers
 _SOAP_REQUEST_HEADERS = {"Content-Type": "application/xml"}
 _SOAP_REQUEST_XML_TEMPLATE = path_xml.read_text(encoding="utf-8")
-_DEFAULT_USERNAME = "admin"
-_DEFAULT_PASSWORD = "admin"
-_DEFAULT_HOST = "localhost"
-_DEFAULT_PORT = 7878
+DEFAULT_USERNAME = "admin"
+DEFAULT_PASSWORD = "admin"
+DEFAULT_HOST = "localhost"
+DEFAULT_PORT = 7878
 
 
 @dataclasses.dataclass
@@ -86,17 +86,21 @@ class SOAPRequest(Base):
     """
 
     command: str = dataclasses.field()
-    username: str = dataclasses.field(default=_DEFAULT_USERNAME)
-    password: str = dataclasses.field(default=_DEFAULT_PASSWORD)
-    host: str = dataclasses.field(default=_DEFAULT_HOST)
-    port: int = dataclasses.field(default=_DEFAULT_PORT)
+    username: str = dataclasses.field(default=None)
+    password: str = dataclasses.field(default=None)
+    host: str = dataclasses.field(default=None)
+    port: int = dataclasses.field(default=None)
 
     @property
     def endpoint(self) -> str:
         """
         Construct the Soap service endpoint URL.
         """
-        return f"http://{self.username}:{self.password}@{self.host}:{self.port}/"
+        username = self.username or DEFAULT_USERNAME
+        password = self.password or DEFAULT_PASSWORD
+        host = self.host or DEFAULT_HOST
+        port = self.port or DEFAULT_PORT
+        return f"http://{username}:{password}@{host}:{port}/"
 
     def send(self) -> "SOAPResponse":  # pragma: no cover
         """
@@ -164,7 +168,7 @@ class SOAPResponse(Base):
                 succeeded=False,
             )
 
-        raise SoapResponseParseError(f"Cannot parse the response: {body!r}")
+        raise SOAPResponseParseError(f"Cannot parse the response: {body!r}")
 
     def print(self):  # pragma: no cover
         """
