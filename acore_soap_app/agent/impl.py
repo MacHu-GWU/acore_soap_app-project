@@ -14,6 +14,8 @@ import requests
 
 from ..paths import dir_python_lib
 from ..exc import SOAPResponseParseError
+from ..utils import get_object, put_object
+
 
 # ------------------------------------------------------------------------------
 # Soap Request and Response
@@ -42,7 +44,7 @@ class Base:
         """
         Convert the object to a dict.
         """
-        return dataclasses.asdict(self)
+        return {k: v for k, v in dataclasses.asdict(self).items() if v is not None}
 
     @classmethod
     def from_json(cls, json_str: str):
@@ -56,6 +58,28 @@ class Base:
         Convert the object to a JSON string.
         """
         return json.dumps(self.to_dict())
+
+    @classmethod
+    def batch_load_from_s3(
+        cls,
+        s3uri: str,
+        s3_client,
+    ) -> T.List["Base"]:
+        json_str = get_object(s3_client, s3uri=s3uri)
+        return [cls.from_dict(dct) for dct in json.loads(json_str)]
+
+    @classmethod
+    def batch_dump_to_s3(
+        cls,
+        instances: T.Iterable,
+        s3uri: str,
+        s3_client,
+    ):
+        """
+        将多个 :class:`SOAPRequest` 以 JSON 格式保存到 S3 中.
+        """
+        data = [instance.to_dict() for instance in instances]
+        put_object(s3_client=s3_client, s3uri=s3uri, body=json.dumps(data))
 
 
 @dataclasses.dataclass
@@ -127,6 +151,67 @@ class SOAPRequest(Base):
             data=_SOAP_REQUEST_XML_TEMPLATE.format(command=self.command),
         )
         return SOAPResponse.parse(http_response.text)
+
+    @classmethod
+    def batch_load(
+        cls,
+        request_like: T.Union[
+            str,
+            T.List[str],
+            "SOAPRequest",
+            T.List["SOAPRequest"],
+        ],
+        s3_client=None,
+        username: T.Optional[str] = None,
+        password: T.Optional[str] = None,
+    ) -> T.List["SOAPRequest"]:
+        """
+        从各种形式的输入中加载 :class:`SOAPRequest`. 该方法总是返回一个列表.
+
+        输入参数 ``request_like`` 代表着要运行的 GM 命令, 它可能是以下几种形式中的一种:
+
+        - 如果是一个字符串:
+            - 如果是以 s3:// 开头, 那么就去 S3 读数据, 此时需要给定 ``s3_client`` 参数:
+                - 如果读到的数据是单个字典, 那么就视为一个 SOAPRequest.
+                - 如果读到的数据是一个列表, 那么就视为多个 SOAPRequest.
+            - 如果不是以 s3:// 开头, 那么就视为一个 GM command.
+        - 如果是一个字符串列表, 那么就视为多个 GM 命令.
+        - 它还可以是单个 SOAPRequest 或 SOAPRequest 列表.
+        - 这个参数最终都会被转换成 SOAPRequest 的列表.
+        """
+        if isinstance(request_like, str):
+            if request_like.startswith("s3://"):  # pragma: no cover
+                data = json.loads(get_object(s3_client=s3_client, s3uri=request_like))
+                if isinstance(data, dict):  # pragma: no cover
+                    requests = [SOAPRequest.from_dict(data)]
+                elif isinstance(data, list):
+                    requests = [SOAPRequest.from_dict(dct) for dct in data]
+                else:  # pragma: no cover
+                    raise TypeError(
+                        f"data in S3 must be a dict or "
+                        f"a list of dict, not {type(data)}"
+                    )
+            else:
+                requests = [SOAPRequest(command=request_like)]
+        elif isinstance(request_like, SOAPRequest):
+            requests = [request_like]
+        elif isinstance(request_like, list):
+            if isinstance(request_like[0], str):
+                requests = [SOAPRequest(command=item) for item in request_like]
+            elif isinstance(request_like[0], SOAPRequest):
+                requests = request_like
+            else:
+                raise TypeError(
+                    f"item ``request_like`` list must be "
+                    f"str or SOAPRequest, not {type(request_like[0])}"
+                )
+        else:  # pragma: no cover
+            raise TypeError(
+                f"request must be str or SOAPRequest, " f"not {type(request_like)}"
+            )
+        for request in requests:
+            request.set_default(username=username, password=password)
+        return requests
 
 
 @dataclasses.dataclass
