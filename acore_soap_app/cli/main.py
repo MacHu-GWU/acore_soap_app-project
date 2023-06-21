@@ -41,7 +41,7 @@ class Command:
         :param s3uri: if None, then return the response as JSON, otherwise, save
             the response to S3.
 
-        Example:
+        Example::
 
         - ``acsoap gm --help``
         - ``acsoap gm ".server info"``
