@@ -86,10 +86,23 @@ class SOAPRequest(Base):
     """
 
     command: str = dataclasses.field()
-    username: str = dataclasses.field(default=None)
-    password: str = dataclasses.field(default=None)
-    host: str = dataclasses.field(default=None)
-    port: int = dataclasses.field(default=None)
+    username: T.Optional[str] = dataclasses.field(default=None)
+    password: T.Optional[str] = dataclasses.field(default=None)
+    host: T.Optional[str] = dataclasses.field(default=None)
+    port: T.Optional[int] = dataclasses.field(default=None)
+
+    def set_default(
+        self,
+        username: T.Optional[str],
+        password: T.Optional[str],
+    ):
+        """
+        Set default values for username and password if they are not set.
+        """
+        if self.username is None:
+            self.username = username
+        if self.password is None:
+            self.password = password
 
     @property
     def endpoint(self) -> str:

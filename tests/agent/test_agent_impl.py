@@ -21,6 +21,10 @@ class TestSOAPRequest:
         assert req1.to_dict() == req.to_dict()
 
         assert req.endpoint == "http://admin:admin@localhost:7878/"
+        req.set_default("test", "test")
+        assert req.endpoint == "http://test:test@localhost:7878/"
+        req.set_default("test1", "test1")
+        assert req.endpoint == "http://test:test@localhost:7878/"
 
 
 class TestSoapResponse:
