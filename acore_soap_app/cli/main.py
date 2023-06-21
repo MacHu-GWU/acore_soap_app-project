@@ -44,9 +44,7 @@ class Command:
         Example:
 
         - ``acsoap gm --help``
-
         - ``acsoap gm ".server info"``
-
         - ``acsoap gm s3://bucket/request.json``
         """
         if cmd.startswith("s3://"):
