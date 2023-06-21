@@ -57,6 +57,12 @@ Welcome to ``acore_soap_app`` Documentation
 - Agent: 提供了一个部署在游戏服务器 EC2 上的命令行程序, 作为外部 API 调用的桥梁. 使得外部有权限的开发者可以通过 AWS SSM Run Command 远程调用这个命令行程序, 从而实现远程执行 GM 命令.
 - SDK: 提供了一套远程运行服务器命令的 SDK, 并提供了很多高级功能例如批量执行, 错误处理等功能. 使得开发者可以很方便的编写出基于 GM 命令的应用程序.
 
+在 EC2 上安装完 Agent 之后, 你可以用下面的命令测试.
+
+.. code-block:: bash
+
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap gm ".server info"
+
 
 .. _install:
 
