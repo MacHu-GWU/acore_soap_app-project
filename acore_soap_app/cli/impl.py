@@ -32,7 +32,6 @@ def get_object(s3_client, s3uri: str) -> str:
 
 
 def put_object(s3_client, s3uri: str, body: str):
-    print(s3uri)
     parts = s3uri.split("/", 3)
     bucket, key = parts[2], parts[3]
     return s3_client.put_object(

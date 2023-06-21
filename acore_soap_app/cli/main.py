@@ -43,9 +43,14 @@ class Command:
 
         Example::
 
-        - ``acsoap gm --help``
-        - ``acsoap gm ".server info"``
-        - ``acsoap gm s3://bucket/request.json``
+        - acsoap gm --help
+
+        - acsoap gm ".server info"
+
+        - acsoap gm ".server info" --user myuser --pwd mypwd
+
+        - acsoap gm ".server info" --s3uri s3://bucket/output.json
+
         """
         if cmd.startswith("s3://"):
             request = cmd
@@ -71,6 +76,16 @@ class Command:
         :param raises: raise error if any of the GM command failed.
         :param s3uri_out: if None, then return the response as JSON, otherwise, save
             the response to S3.
+
+        Example::
+
+        - acsoap batch_gm --help
+
+        - acsoap batch_gm s3://bucket/input.json
+
+        - acsoap batch_gm s3://bucket/input.json --user myuser --pwd mypwd
+
+        - acsoap batch_gm s3://bucket/input.json --s3uri_out s3://bucket/output.json
         """
         batch_gm(
             requests=s3uri_in,
