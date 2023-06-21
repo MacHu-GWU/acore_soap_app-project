@@ -17,4 +17,9 @@ x.y.z (Backlog)
 
 0.1.1 (2023-06-20)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Features and Improvements**
+
 - First release
+- Add SOAP agent CLI module.
+- Add SDK module.
+- Add lots of canned GM command Python functions.
