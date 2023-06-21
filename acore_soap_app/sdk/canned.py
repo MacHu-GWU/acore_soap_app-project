@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """
-- 我们只关心运行成功与否, 不关心返回值.
-- 我们需要这个命令返回的数据.
+对具体的 GM 命令业务逻辑高度封装后的接口. 这些接口可以分为两类:
+
+1. 我们只关心运行成功与否, 不关心返回值.
+2. 我们需要这个命令返回的数据.
+
+所有的接口都有这三个参数:
+
+- bsm: ``boto_session_manager.BotoSesManager`` 对象, 定义了 AWS 权限.
+- server_id: 服务器的逻辑 ID, 命名规则为 ``${env_name}-${server_name}``. 例如 ``sbx-blue``.
+- raises: 当命令执行失败时是否抛出异常, 默认为 ``True``.
 
 Reference:
 
@@ -12,9 +20,7 @@ Reference:
 import typing as T
 import re
 from boto_session_manager import BotoSesManager
-import aws_ssm_run_command.api as aws_ssm_run_command
 
-from ..agent.api import SOAPResponse
 from ..exc import SOAPResponseParseError, SOAPCommandFailedError
 from .core import run_soap_command
 
@@ -24,6 +30,9 @@ def get_online_players(
     server_id: str,
     raises: bool = True,
 ) -> T.Dict[str, int]:
+    """
+    :return: a dict with two keys: ``connected_players`` and ``characters_in_world``.
+    """
     response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
@@ -54,6 +63,9 @@ def is_server_online(
     server_id: str,
     raises: bool = True,
 ) -> bool:
+    """
+    :return: a boolean value to indicate whether the server is online
+    """
     result = get_online_players(bsm, server_id, raises=raises)
     return True
 
@@ -87,10 +99,10 @@ def set_gm_level(
     raises: bool = True,
 ) -> bool:
     """
-
     :param username:
     :param level:
     :param realm_id:
+
     :return: a boolean value to indicate whether the account is created successfully
     """
     response = run_soap_command(
@@ -111,10 +123,10 @@ def set_password(
     raises: bool = True,
 ) -> bool:
     """
-
     :param username:
     :param level:
     :param realm_id:
+
     :return: a boolean value to indicate whether the account is created successfully
     """
     response = run_soap_command(
@@ -134,6 +146,8 @@ def delete_account(
     raises: bool = True,
 ) -> bool:
     """
+    :param username:
+
     :return: a boolean value to indicate whether the account is deleted successfully
     """
     response = run_soap_command(
@@ -160,7 +174,6 @@ def gm_list(
         request_like=f".gm list",
         raises=raises,
     )[0]
-    print(response.message)
     if response.succeeded:
         results = list()
         lines = response.message.splitlines()

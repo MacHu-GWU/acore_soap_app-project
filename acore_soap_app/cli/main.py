@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+SOAP Agent command line user interface.
+"""
+
 import typing as T
 import fire
 
@@ -9,6 +13,13 @@ from .impl import (
 
 
 class Command:
+    """
+    Acore Soap Agent command line interface.
+
+    Example:
+
+    - acsoap
+    """
     # --------------------------------------------------------------------------
     # These two command can only be used on EC2
     # --------------------------------------------------------------------------

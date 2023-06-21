@@ -1,4 +1,4 @@
-Access Game Server Console Remotely
+Run GM Command in Game Server Console Remotely
 ==============================================================================
 
 

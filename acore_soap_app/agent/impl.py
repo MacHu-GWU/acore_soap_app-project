@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-todo: add docstring
+Agent implementation.
 """
 
 import typing as T
