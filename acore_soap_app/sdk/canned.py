@@ -14,32 +14,34 @@ import re
 from boto_session_manager import BotoSesManager
 import aws_ssm_run_command.api as aws_ssm_run_command
 
-from ..agent.api import SoapResponse
-from ..exc import SoapResponseParseError, SoapCommandFailedError
-from .remote_command import run_soap_command
+from ..agent.api import SOAPResponse
+from ..exc import SOAPResponseParseError, SOAPCommandFailedError
+from .core import run_soap_command
 
 
 def get_online_players(
     bsm: BotoSesManager,
     server_id: str,
+    raises: bool = True,
 ) -> T.Dict[str, int]:
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=".server info",
-    )
+        request_like=".server info",
+        raises=raises,
+    )[0]
 
-    res = re.findall("Connected players: (\d+)", soap_res.message)
+    res = re.findall("Connected players: (\d+)", response.message)
     if len(res) == 1:
         connected_players = int(res[0])
     else:
-        raise SoapResponseParseError(soap_res.message)
+        raise SOAPResponseParseError(response.message)
 
-    res = re.findall("Characters in world: (\d+)", soap_res.message)
+    res = re.findall("Characters in world: (\d+)", response.message)
     if len(res) == 1:
         characters_in_world = int(res[0])
     else:
-        raise SoapResponseParseError(soap_res.message)
+        raise SOAPResponseParseError(response.message)
 
     return {
         "connected_players": connected_players,
@@ -50,8 +52,9 @@ def get_online_players(
 def is_server_online(
     bsm: BotoSesManager,
     server_id: str,
+    raises: bool = True,
 ) -> bool:
-    result = get_online_players(bsm, server_id)
+    result = get_online_players(bsm, server_id, raises=raises)
     return True
 
 
@@ -60,17 +63,19 @@ def create_account(
     server_id: str,
     username: str,
     password: str,
+    raises: bool = True,
 ) -> bool:
     """
     :return: a boolean value to indicate whether the account is created successfully
     """
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=f".account create {username} {password}",
-    )
-    soap_res.print()
-    return soap_res.succeeded
+        request_like=f".account create {username} {password}",
+        raises=raises,
+    )[0]
+    response.print()
+    return response.succeeded
 
 
 def set_gm_level(
@@ -79,6 +84,7 @@ def set_gm_level(
     username: str,
     level: int,
     realm_id: int,
+    raises: bool = True,
 ) -> bool:
     """
 
@@ -87,13 +93,14 @@ def set_gm_level(
     :param realm_id:
     :return: a boolean value to indicate whether the account is created successfully
     """
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=f".account set gmlevel {username} {level} {realm_id}",
-    )
-    soap_res.print()
-    return soap_res.succeeded
+        request_like=f".account set gmlevel {username} {level} {realm_id}",
+        raises=raises,
+    )[0]
+    response.print()
+    return response.succeeded
 
 
 def set_password(
@@ -101,6 +108,7 @@ def set_password(
     server_id: str,
     username: str,
     password: str,
+    raises: bool = True,
 ) -> bool:
     """
 
@@ -109,52 +117,57 @@ def set_password(
     :param realm_id:
     :return: a boolean value to indicate whether the account is created successfully
     """
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=f".account set password {username} {password} {password}",
-    )
-    soap_res.print()
-    return soap_res.succeeded
+        request_like=f".account set password {username} {password} {password}",
+        raises=raises,
+    )[0]
+    response.print()
+    return response.succeeded
 
 
 def delete_account(
     bsm: BotoSesManager,
     server_id: str,
     username: str,
+    raises: bool = True,
 ) -> bool:
     """
     :return: a boolean value to indicate whether the account is deleted successfully
     """
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=f".account delete {username}",
-    )
-    soap_res.print()
-    return soap_res.succeeded
+        request_like=f".account delete {username}",
+        raises=raises,
+    )[0]
+    response.print()
+    return response.succeeded
 
 
 def gm_list(
     bsm: BotoSesManager,
     server_id: str,
+    raises: bool = True,
 ) -> T.List[T.Tuple[str, int]]:
     """
     :return: a boolean value to indicate whether the account is deleted successfully
     """
-    soap_res = run_soap_command(
+    response = run_soap_command(
         bsm=bsm,
         server_id=server_id,
-        cmd=f".gm list",
-    )
-    print(soap_res.message)
-    if soap_res.succeeded:
+        request_like=f".gm list",
+        raises=raises,
+    )[0]
+    print(response.message)
+    if response.succeeded:
         results = list()
-        lines = soap_res.message.splitlines()
+        lines = response.message.splitlines()
         for line in lines:
             if line.startswith("|"):
                 words = [word.strip() for word in line.split("|") if word.strip()]
                 results.append((words[0], int(words[1])))
         return results
     else:
-        raise SoapCommandFailedError
+        raise SOAPCommandFailedError

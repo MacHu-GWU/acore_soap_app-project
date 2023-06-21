@@ -20,7 +20,7 @@ def build_cli_arg_for_gm(
     command: str,
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
-    raises: T.Optional[bool] = True,
+    raises: bool = True,
     s3uri_output: T.Optional[str] = None,
     path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
 ) -> str:
@@ -54,7 +54,7 @@ def run_soap_command(
     ],
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
-    raises: T.Optional[bool] = True,
+    raises: bool = True,
     s3uri_input: T.Optional[str] = None,
     s3uri_output: T.Optional[str] = None,
     path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
@@ -62,22 +62,25 @@ def run_soap_command(
     delays: int = 1,
     timeout: int = 10,
     verbose: bool = True,
-) -> T.Union[SOAPResponse, str]:
+) -> T.Union[T.List[SOAPResponse], str]:
     """
     从任何地方, 通过 SSM Run Command, 远程执行 SOAP 命令.
 
     :param bsm:
-    :param server_id:
+    :param server_id: AzerothCore 服务器的逻辑 ID, 命名规律为 "${env_name}-${server_name}",
+        例如 "sbx-blue"
     :param request_like: 请参考
         :class:`~acore_soap_app.agent.impl.SOAPRequest.batch_load`
     :param username: 默认的用户名, 只有当 request.username 为 None 的时候才会用到.
     :param password: 默认的密码, 只有当 request.password 为 None 的时候才会用到.
     :param raises: 默认为 True. 如果为 True, 则在遇到错误时抛出异常. 反之则将
         failed SOAP Response 原封不动地返回.
-    :param s3uri_input:
+    :param s3uri_input: 如果指定, 则将输入写入 S3. 常用于 Payload 比较大的情况.
+        如果你一次性发送的 request 大于 20 条, 则必须使用这个参数.
     :param s3uri_output: 如果不指定, 则默认将输出作为 JSON 打印. 如果指定了 s3uri,
         则将输出写入到 S3.
-    :param sync: 同步和异步模式
+    :param path_cli: EC2 上 acsoap 命令行工具的绝对路径.
+    :param sync: 同步和异步模式, 默认为同步模式
         - 如果以同步模式运行, 则会等待 SSM Run Command 完成
         - 如果以异步模式运行, 则会立刻返回一个 SSM Run Command 的 command id.
     :param delays: 同步模式下的等待间隔
@@ -155,11 +158,11 @@ def run_soap_command(
         ssm_client=bsm.ssm_client,
         command_id=command_id,
         instance_id=instance_id,
+        raises=False,
         delays=delays,
         timeout=timeout,
         verbose=verbose,
     )
-
     if command_invocation.ResponseCode != 0:
         raise RunCommandError.from_command_invocation(command_invocation)
 

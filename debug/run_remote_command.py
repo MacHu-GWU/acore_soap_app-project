@@ -10,7 +10,7 @@ from acore_soap_app.sdk.api import run_soap_command
 bsm = BotoSesManager(profile_name="bmt_app_dev_us_east_1")
 server_id = "sbx-blue"
 
-command = [
+commands = [
     ".account delete test1",
     ".account create test1 1234",
     ".account set gmlevel test1 3 -1",
@@ -20,6 +20,6 @@ command = [
 command_id = run_soap_command(
     bsm=bsm,
     server_id=server_id,
-    cmd=command,
+    request_like=commands,
     sync=False,
 )
