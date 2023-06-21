@@ -40,13 +40,13 @@ def get_online_players(
         raises=raises,
     )[0]
 
-    res = re.findall("Connected players: (\d+)", response.message)
+    res = re.findall(r"Connected players: (\d+)", response.message)
     if len(res) == 1:
         connected_players = int(res[0])
     else:
         raise SOAPResponseParseError(response.message)
 
-    res = re.findall("Characters in world: (\d+)", response.message)
+    res = re.findall(r"Characters in world: (\d+)", response.message)
     if len(res) == 1:
         characters_in_world = int(res[0])
     else:
