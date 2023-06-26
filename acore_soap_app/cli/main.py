@@ -10,6 +10,7 @@ import fire
 from .impl import (
     gm,
     count_online_players,
+    measure_server_status,
 )
 
 
@@ -36,6 +37,26 @@ class Canned:
             username=user,
             password=pwd,
         )
+
+    def measure_server_status(
+        self,
+        user: T.Optional[str] = None,
+        pwd: T.Optional[str] = None,
+    ):
+        """
+        Measure server status and save result to EC2 tags.
+
+        Example::
+
+            acsoap canned measure-server-status --help
+
+            acsoap canned measure-server-status
+        """
+        measure_server_status(
+            username=user,
+            password=pwd,
+        )
+
 
 
 class Command:
