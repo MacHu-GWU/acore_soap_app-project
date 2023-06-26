@@ -171,7 +171,6 @@ def measure_server_status(
     bsm = BotoSesManager(region_name=aws_region)
     instance_id = Ec2Instance.get_instance_id()
     bsm.ec2_client.create_tags(
-        DryRun=True | False,
         Resources=[instance_id],
         Tags=[dict(Key=k, Value=v) for k, v in tags.items()],
     )
