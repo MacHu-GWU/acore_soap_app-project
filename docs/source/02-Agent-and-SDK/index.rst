@@ -21,11 +21,11 @@ Agent
 
     /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap gm ".server info"
 
-统计在线玩家数量, 顺便查看一下服务器状态:
+创建新账号:
 
 .. code-block:: bash
 
-    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap acsoap canned count-online-players
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap gm ".account create myusername mypassword"
 
 
 SDK
@@ -48,3 +48,7 @@ SDK
    :language: python
    :linenos:
 
+
+What's Next
+------------------------------------------------------------------------------
+了解了 Agent 和 SDK 两个组件以后, 我们可以进入下一篇文档, 来看看一些小工具吧.
