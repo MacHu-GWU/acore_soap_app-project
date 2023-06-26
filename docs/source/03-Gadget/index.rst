@@ -9,7 +9,7 @@ count_online_players
 
 .. code-block:: bash
 
-    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap acsoap canned count-online-players
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap canned count-online-players
 
 
 measure_server_status
@@ -18,4 +18,4 @@ measure_server_status
 
 .. code-block:: bash
 
-    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap acsoap canned measure-server-status
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap canned measure-server-status
