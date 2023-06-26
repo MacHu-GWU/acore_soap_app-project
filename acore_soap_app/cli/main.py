@@ -23,6 +23,9 @@ class Canned:
         password: T.Optional[str] = None,
     ):
         """
+        Get the online players and characters in world. Also, you can use this
+         command to check whether server is online.
+
         Example::
 
             acsoap canned count-online-players
