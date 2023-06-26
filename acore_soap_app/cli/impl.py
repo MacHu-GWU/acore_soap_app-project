@@ -6,6 +6,9 @@ Command line low lever implementations.
 
 import typing as T
 import json
+from datetime import datetime, timezone
+
+from acore_constants.api import TagKey
 
 from ..agent.api import SOAPRequest, SOAPResponse, get_boto_ses
 from ..sdk.api import canned
@@ -87,10 +90,24 @@ def gm(
         )
 
 
-def count_online_players(
+def _count_online_players(
     username: T.Optional[str] = None,
     password: T.Optional[str] = None,
-):
+) -> dict:
+    """
+    底层函数, 通过运行 GM 命令来获得服务器的在线玩家数, 同时获得服务器的在线状态.
+    返回一个包含以上信息的字典.
+
+    Example output:
+
+    .. code-block:: python
+
+        {
+            "connected_players": 1000,
+            "characters_in_world": 700,
+            "server_is_online": True,
+        }
+    """
     requests = SOAPRequest.batch_load(
         request_like=".server info",
         username=username,
@@ -102,15 +119,59 @@ def count_online_players(
         connected_players, characters_in_world = canned.extract_online_players(
             response.message
         )
-        data = {
+        return {
             "connected_players": connected_players,
             "characters_in_world": characters_in_world,
             "server_is_online": True,
         }
     except Exception as e:
-        data = {
+        return {
             "connected_players": None,
             "characters_in_world": None,
             "server_is_online": False,
         }
+
+
+def count_online_players(
+    username: T.Optional[str] = None,
+    password: T.Optional[str] = None,
+):
+    """
+    打印在线玩家数量, 以及服务器的在线状态, 以 JSON 的形式输出到 stdout.
+    """
+    data = _count_online_players(username=username, password=password)
     print(json.dumps(data, indent=4))
+
+
+def measure_server_status(
+    username: T.Optional[str] = None,
+    password: T.Optional[str] = None,
+):
+    """
+    测量服务器的在线状态, 并将结果保存到 EC2 实例的 Tags 中.
+    """
+    from boto_session_manager import BotoSesManager
+    from simple_aws_ec2.api import Ec2Instance
+
+    data = _count_online_players(username=username, password=password)
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+
+    if data["server_is_online"]:
+        tags = {
+            TagKey.WOW_STATUS: "{} players".format(data["connected_players"]),
+            TagKey.WOW_STATUS_MEASURE_TIME: now.isoformat(),
+        }
+    else:
+        tags = {
+            TagKey.WOW_STATUS: "stopped",
+            TagKey.WOW_STATUS_MEASURE_TIME: now.isoformat(),
+        }
+
+    aws_region = Ec2Instance.get_placement_region()
+    bsm = BotoSesManager(region_name=aws_region)
+    instance_id = Ec2Instance.get_instance_id()
+    bsm.ec2_client.create_tags(
+        DryRun=True | False,
+        Resources=[instance_id],
+        Tags=[dict(Key=k, Value=v) for k, v in tags.items()],
+    )
