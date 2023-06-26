@@ -97,8 +97,8 @@ def count_online_players(
         password=password,
     )
     request = requests[0]
-    response = request.send()
     try:
+        response = request.send()
         connected_players, characters_in_world = canned.extract_online_players(
             response.message
         )
@@ -107,7 +107,7 @@ def count_online_players(
             "characters_in_world": characters_in_world,
             "server_is_online": True,
         }
-    except:
+    except Exception as e:
         data = {
             "connected_players": None,
             "characters_in_world": None,

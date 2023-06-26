@@ -28,6 +28,8 @@ class Canned:
 
         Example::
 
+            acsoap canned count-online-players --help
+
             acsoap canned count-online-players
         """
         count_online_players(
