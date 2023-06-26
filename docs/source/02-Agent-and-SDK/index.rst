@@ -13,14 +13,32 @@ SDK 则是一套开发者工具. 它对用 Run Command Service 远程执行 CLI 
 
 Agent
 ------------------------------------------------------------------------------
-:class:`~acore_soap_app.cli.main.Command` 定义了 SOAP Agent CLI 的命令和参数.
+下面列出了部分常用 Agent 的 CLI 命令的功能和语法. 至于详细的命令和参数列表, 请参考 :mod:`~acore_soap_app.cli.main` 模块的文档.
+
+查看服务器状态:
+
+.. code-block:: bash
+
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap gm ".server info"
+
+统计在线玩家数量, 顺便查看一下服务器状态:
+
+.. code-block:: bash
+
+    /home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap acsoap canned count-online-players
 
 
 SDK
 ------------------------------------------------------------------------------
-下面这个例子展示了如何用 :func:`~acore_soap_app.sdk.core.run_soap_command` 函数来在任何地方远程执行 GM 命令.
+下面这个例子展示了如何用 :func:`~acore_soap_app.agent.impl.SOAPRequest` 函数来在服务器上编写基于 SOAP 的自动化脚本.
 
 .. literalinclude:: ../../../examples/run_soap_command.py
+   :language: python
+   :linenos:
+
+下面这个例子展示了如何用 :func:`~acore_soap_app.sdk.core.run_remote_command` 函数来在任何地方远程执行 GM 命令.
+
+.. literalinclude:: ../../../examples/run_remote_command.py
    :language: python
    :linenos:
 

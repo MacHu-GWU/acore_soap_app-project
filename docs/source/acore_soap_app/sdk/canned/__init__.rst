@@ -1,7 +1,7 @@
-sdk
-===
+canned
+======
 
-.. automodule:: acore_soap_app.sdk
+.. automodule:: acore_soap_app.sdk.canned
     :members:
 
 sub packages and modules
@@ -10,7 +10,6 @@ sub packages and modules
 .. toctree::
     :maxdepth: 1
 
-    canned <canned/__init__>
     api <api>
-    core <core>
+    impl <impl>
     

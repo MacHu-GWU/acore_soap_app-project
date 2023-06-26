@@ -19,8 +19,8 @@ class Canned:
     """
     def count_online_players(
         self,
-        username: T.Optional[str] = None,
-        password: T.Optional[str] = None,
+        user: T.Optional[str] = None,
+        pwd: T.Optional[str] = None,
     ):
         """
         Get the online players and characters in world. Also, you can use this
@@ -33,8 +33,8 @@ class Canned:
             acsoap canned count-online-players
         """
         count_online_players(
-            username=username,
-            password=password,
+            username=user,
+            password=pwd,
         )
 
 
