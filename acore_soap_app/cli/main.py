@@ -14,11 +14,19 @@ from .impl import (
 
 
 class Canned:
+    """
+    A collection of canned SOAP Agent commands.
+    """
     def count_online_players(
         self,
         username: T.Optional[str] = None,
         password: T.Optional[str] = None,
     ):
+        """
+        Example::
+
+            acsoap canned count-online-players
+        """
         count_online_players(
             username=username,
             password=password,
