@@ -21,8 +21,24 @@ import typing as T
 import re
 from boto_session_manager import BotoSesManager
 
-from ..exc import SOAPResponseParseError, SOAPCommandFailedError
-from .core import run_soap_command
+from ...exc import SOAPResponseParseError, SOAPCommandFailedError
+from ..core import run_soap_command
+
+
+def extract_online_players(message: str) -> T.Tuple[int, int]:
+    res = re.findall(r"Connected players: (\d+)", message)
+    if len(res) == 1:
+        connected_players = int(res[0])
+    else:  # pragma: no cover
+        raise SOAPResponseParseError(message)
+
+    res = re.findall(r"Characters in world: (\d+)", message)
+    if len(res) == 1:
+        characters_in_world = int(res[0])
+    else:  # pragma: no cover
+        raise SOAPResponseParseError(message)
+
+    return connected_players, characters_in_world
 
 
 def get_online_players(
@@ -40,17 +56,7 @@ def get_online_players(
         raises=raises,
     )[0]
 
-    res = re.findall(r"Connected players: (\d+)", response.message)
-    if len(res) == 1:
-        connected_players = int(res[0])
-    else:
-        raise SOAPResponseParseError(response.message)
-
-    res = re.findall(r"Characters in world: (\d+)", response.message)
-    if len(res) == 1:
-        characters_in_world = int(res[0])
-    else:
-        raise SOAPResponseParseError(response.message)
+    connected_players, characters_in_world = extract_online_players(response.message)
 
     return {
         "connected_players": connected_players,
