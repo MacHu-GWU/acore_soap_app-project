@@ -5,8 +5,10 @@ Command line low lever implementations.
 """
 
 import typing as T
+import json
 
 from ..agent.api import SOAPRequest, SOAPResponse, get_boto_ses
+from ..sdk.api import canned
 from ..exc import SOAPCommandFailedError
 
 
@@ -83,3 +85,32 @@ def gm(
             instances=responses,
             s3uri=s3uri_output,
         )
+
+
+def count_online_players(
+    username: T.Optional[str] = None,
+    password: T.Optional[str] = None,
+):
+    requests = SOAPRequest.batch_load(
+        request_like=".server info",
+        username=username,
+        password=password,
+    )
+    request = requests[0]
+    response = request.send()
+    try:
+        connected_players, characters_in_world = canned.extract_online_players(
+            response.message
+        )
+        data = {
+            "connected_players": connected_players,
+            "characters_in_world": characters_in_world,
+            "server_is_online": True,
+        }
+    except:
+        data = {
+            "connected_players": None,
+            "characters_in_world": None,
+            "server_is_online": False,
+        }
+    print(json.dumps(data, indent=4))

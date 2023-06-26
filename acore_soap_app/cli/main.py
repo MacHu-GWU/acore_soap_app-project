@@ -9,20 +9,35 @@ import fire
 
 from .impl import (
     gm,
+    count_online_players,
 )
+
+
+class Canned:
+    def count_online_players(
+        self,
+        username: T.Optional[str] = None,
+        password: T.Optional[str] = None,
+    ):
+        count_online_players(
+            username=username,
+            password=password,
+        )
 
 
 class Command:
     """
-    Acore Soap Agent command line interface.
+    Acore Soap Agent command line interface. All these commands can only be
+    used on EC2.
 
     Example:
 
     - acsoap
     """
-    # --------------------------------------------------------------------------
-    # These two command can only be used on EC2
-    # --------------------------------------------------------------------------
+
+    def __init__(self):
+        self.canned = Canned()
+
     def gm(
         self,
         cmd: str,
