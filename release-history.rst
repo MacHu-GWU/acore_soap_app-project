@@ -15,33 +15,40 @@ x.y.z (Backlog)
 **Miscellaneous**
 
 
-0.3.3 (2023-06-27)
+0.3.4 (2023-06-28)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Miscellaneous**
 
-- Upgrade dependencies
-- Improve internal implementation
+- Add ``acsoap hello`` command.
+
+
+0.3.3 (2023-06-28)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Miscellaneous**
+
+- Upgrade dependencies.
+- Improve internal implementation.
 
 
 0.3.2 (2023-06-27)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Miscellaneous**
 
-- upgrade dependencies
+- upgrade dependencies.
 
 
 0.3.1 (2023-06-26)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**
 
-- add ``acsoap canned measure-server-status`` command
+- add ``acsoap canned measure-server-status`` command.
 
 
 0.2.1 (2023-06-26)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**
 
-- add ``acsoap canned count-online-players`` command
+- add ``acsoap canned count-online-players`` command.
 
 **Miscellaneous**
 
@@ -52,7 +59,7 @@ x.y.z (Backlog)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**
 
-- First release
+- First release.
 - Add SOAP agent CLI module.
 - Add SDK module.
 - Add lots of canned GM command Python functions.
