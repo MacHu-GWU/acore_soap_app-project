@@ -72,6 +72,12 @@ class Command:
     def __init__(self):
         self.canned = Canned()
 
+    def hello(self):
+        """
+        Print welcome message.
+        """
+        print("Hello acore soap app user!")
+
     def gm(
         self,
         cmd: str,
