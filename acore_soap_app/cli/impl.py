@@ -8,9 +8,10 @@ import typing as T
 import json
 from datetime import datetime, timezone
 
+from simple_aws_ec2.api import EC2MetadataCache
 from acore_constants.api import TagKey
 
-from ..agent.api import SOAPRequest, SOAPResponse, get_boto_ses
+from ..agent.api import SOAPRequest, SOAPResponse
 from ..sdk.api import canned
 from ..exc import SOAPCommandFailedError
 
@@ -64,7 +65,7 @@ def gm(
     ensure_ec2_environment()
 
     # handle input
-    boto_ses = get_boto_ses()
+    boto_ses = EC2MetadataCache.load().get_boto_ses_from_ec2_inside()
     s3_client = boto_ses.client("s3")
     requests = SOAPRequest.batch_load(
         request_like=request_like,

@@ -7,11 +7,8 @@ Agent implementation.
 import typing as T
 import json
 import dataclasses
-from pathlib import Path
-from datetime import datetime
 import xml.etree.ElementTree as ET
 
-import boto3
 import requests
 
 from ..paths import dir_python_lib
@@ -305,54 +302,3 @@ class SOAPResponse(Base):
         Print the dataclass, ignore the raw response body.
         """
         print({"succeeded": self.succeeded, "message": self.message})
-
-
-# ------------------------------------------------------------------------------
-# Create boto3 session on EC2
-# ------------------------------------------------------------------------------
-path_aws_region_cache = Path.home().joinpath(".aws_region_cache.json")
-
-
-def _dump_aws_region_cache(region: str):  # pragma: no cover
-    path_aws_region_cache.write_text(
-        json.dumps({"region": region, "timestamp": int(datetime.utcnow().timestamp())})
-    )
-
-
-def _load_aws_region_cache() -> T.Optional[str]:  # pragma: no cover
-    if not path_aws_region_cache.exists():
-        return None
-    data = json.loads(path_aws_region_cache.read_text())
-    if (datetime.utcnow().timestamp() - data["timestamp"]) > 86400:  # cache expired
-        return None
-    else:
-        return data["region"]
-
-
-def get_ec2_metadata(name: str) -> str:  # pragma: no cover
-    """
-    Get the EC2 instance id from the AWS EC2 metadata API.
-
-    Reference:
-
-    - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
-    """
-    url = f"http://169.254.169.254/latest/meta-data/{name}"
-    return requests.get(url).text.strip()
-
-
-def get_ec2_region() -> str:  # pragma: no cover
-    region = _load_aws_region_cache()
-    if region is None:
-        region = get_ec2_metadata("placement/region")
-        _dump_aws_region_cache(region)
-    return region
-
-
-def get_boto_ses() -> boto3.session.Session:  # pragma: no cover
-    """
-    On EC2, we use the IAM role to get the AWS credentials. You only need to
-    specify the region name, however, it is automatically discovered by the
-    EC2 metadata API.
-    """
-    return boto3.session.Session(region_name=get_ec2_region())
