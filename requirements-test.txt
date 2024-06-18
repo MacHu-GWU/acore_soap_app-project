@@ -1,5 +1,5 @@
 # This requirements file should only include dependencies for testing
 pytest                                  # test framework
 pytest-cov                              # coverage test
-moto
+moto>=4.2.14,<5.0.0
 rich

@@ -3,7 +3,7 @@
 import typing as T
 
 
-if T.TYPE_CHECKING:
+if T.TYPE_CHECKING: # pragma: no cover
     import aws_ssm_run_command.api as aws_ssm_run_command
 
 

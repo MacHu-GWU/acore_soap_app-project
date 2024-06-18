@@ -24,7 +24,8 @@ def build_cli_arg_for_gm(
     path_cli: str = "/home/ubuntu/git_repos/acore_soap_app-project/.venv/bin/acsoap",
 ) -> str:
     """
-    构造最终的命令行参数.
+    构造最终的 acsoap 命令行参数. 以便之后 pass 给
+    :meth:`acore_soap_app.cli.main.Command.gm` 命令.
     """
     args = [
         path_cli,
@@ -151,11 +152,12 @@ def run_soap_command(
         ]
 
     # run command
-    command_id = aws_ssm_run_command.better_boto.send_command(
+    command = aws_ssm_run_command.better_boto.run_shell_script_async(
         ssm_client=bsm.ssm_client,
-        instance_id=instance_id,
         commands=commands,
+        instance_ids=instance_id,
     )
+    command_id = command.CommandId
     if sync is False:  # async mode, return immediately
         return command_id
 
@@ -163,7 +165,7 @@ def run_soap_command(
     time.sleep(1)
 
     # get command response
-    command_invocation = aws_ssm_run_command.better_boto.wait_until_command_succeeded(
+    command_invocation = aws_ssm_run_command.better_boto.wait_until_send_command_succeeded(
         ssm_client=bsm.ssm_client,
         command_id=command_id,
         instance_id=instance_id,
