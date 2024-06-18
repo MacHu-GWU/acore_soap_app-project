@@ -3,7 +3,7 @@
     :target: https://acore-soap-app.readthedocs.io/en/latest/
     :alt: Documentation Status
 
-.. image:: https://github.com/MacHu-GWU/acore_soap_app-project/workflows/CI/badge.svg
+.. image:: https://github.com/MacHu-GWU/acore_soap_app-project/actions/workflows/main.yml/badge.svg
     :target: https://github.com/MacHu-GWU/acore_soap_app-project/actions?query=workflow:CI
 
 .. image:: https://codecov.io/gh/MacHu-GWU/acore_soap_app-project/branch/main/graph/badge.svg
