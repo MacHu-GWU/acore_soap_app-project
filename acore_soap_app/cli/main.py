@@ -2,6 +2,8 @@
 
 """
 SOAP Agent command line user interface.
+
+See :class:`Command` for details.
 """
 
 import typing as T
@@ -63,10 +65,6 @@ class Command:
     """
     Acore Soap Agent command line interface. All these commands can only be
     used on EC2.
-
-    Example:
-
-    - acsoap
     """
 
     def __init__(self):
@@ -87,14 +85,8 @@ class Command:
         s3uri: T.Optional[str] = None,
     ):
         """
-        Run single GM command.
-
-        :param cmd: the GM command to run
-        :param user: in game GM account username, if not given, then use "admin"
-        :param pwd: in game GM account password, if not given, then use "admin"
-        :param raises: raise error if any of the GM command failed.
-        :param s3uri: if None, then return the response as JSON, otherwise, save
-            the response to S3.
+        Run single GM command. See :func:`acore_soap_app.cli.impl.gm` for implementation
+        details.
 
         Example::
 
@@ -105,6 +97,13 @@ class Command:
             acsoap gm ".server info" --user myuser --pwd mypwd
 
             acsoap gm ".server info" --s3uri s3://bucket/output.json
+
+        :param cmd: the GM command to run
+        :param user: in game GM account username, if not given, then use "admin"
+        :param pwd: in game GM account password, if not given, then use "admin"
+        :param raises: raise error if any of the GM command failed.
+        :param s3uri: if None, then return the response as JSON, otherwise, save
+            the response to S3.
         """
         gm(
             request_like=cmd,
