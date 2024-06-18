@@ -64,12 +64,12 @@ Agent 的底层是两个对象 :class:`~acore_soap_app.agent.impl.SOAPRequest` �
 
 SDK
 ------------------------------------------------------------------------------
-:func:`~acore_soap_app.sdk.core.run_soap_command` 是 SDK 的核心函数, 它可以将 GM 命令从任何地方, 例如 EC2, ECS, Lambda, 或是本地电脑, 发送到游戏服务器上运行, 并获得返回的结果. 其他的 SDK 函数都是对这个函数的封装. 这个函数的底层实现是 build 好 :ref:`agent` CLI 所需要的 CLI 命令, 然后使用 `aws_ssm_run_command <https://github.com/MacHu-GWU/aws_ssm_run_command-project>`_ 这个库远程执行这个 :meth:`acore_soap_app.cli.main.Command.gm` CLI. 根据你的参数, 你可以选 SOAP response 打印到 stdout 或是写入到 S3. 而无论你将 SOAP response 发到哪里, ``run_soap_command`` 都会自动的去对应的地方获取数据并返回.
+:func:`~acore_soap_app.sdk.core.run_soap_command` 是 SDK 的核心函数, 它可以将 GM 命令从任何地方, 例如 EC2, ECS, Lambda, 或是本地电脑, 发送到游戏服务器上运行, 并获得返回的结果. 其他的 SDK 函数都是对这个函数的封装. 这个函数的底层实现是 build 好 :ref:`agent` CLI 所需要的 CLI 命令, 然后使用 `aws_ssm_run_command <https://github.com/MacHu-GWU/aws_ssm_run_command-project>`_ 这个库远程执行这个 :meth:`acore_soap_app.cli.main.Command.gm` CLI. 根据你的参数, 你可以选 SOAP response 打印到 stdout 或是写入到 S3. 而无论你将 SOAP response 发到哪里, :func:`~acore_soap_app.sdk.core.run_soap_command` 都会自动的去对应的地方获取数据并返回.
 
 
 Without SDK
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-下面这个例子展示了如何用 :func:`~acore_soap_app.agent.impl.SOAPRequest` 函数来 **在服务器上 (要手动 SSH 进去) ** 编写基于 SOAP 的自动化脚本.
+下面这个例子展示了如何用 :func:`~acore_soap_app.agent.impl.SOAPRequest` 函数来 **在服务器上 (要手动 SSH 进去)** 编写基于 SOAP 的自动化脚本.
 
 .. literalinclude:: ../../../examples/run_soap_command.py
    :language: python
@@ -78,7 +78,7 @@ Without SDK
 
 Basic Usage of SDK
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-下面这个例子展示了如何用 :func:`~acore_soap_app.sdk.core.run_remote_command` 函数来在 **任何地方远程执行** GM 命令.
+下面这个例子展示了如何用 :func:`~acore_soap_app.sdk.core.run_soap_command` 函数来在 **任何地方远程执行** GM 命令.
 
 .. literalinclude:: ../../../examples/run_remote_command.py
    :language: python
@@ -93,7 +93,7 @@ Canned SDK
    :language: python
    :linenos:
 
-我们这里以获得在线玩家数量为例. 我们调用了 :func:`~acore_soap_app.sdk.core.canned.impl.get_online_players` 函数. 而这个函数实际上是调用了 :func:`~acore_soap_app.sdk.core.run_remote_command` 函数并远程执行了 ``.server info`` 命令, 然后对 soap response message 进行解析, 提取出在线玩家数量的信息.
+我们这里以获得在线玩家数量为例. 我们调用了 :func:`~acore_soap_app.sdk.canned.impl.get_online_players` 函数. 而这个函数实际上是调用了 :func:`~acore_soap_app.sdk.core.run_soap_command` 函数并远程执行了 ``.server info`` 命令, 然后对 soap response message 进行解析, 提取出在线玩家数量的信息.
 
 
 What's Next
