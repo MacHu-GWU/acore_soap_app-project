@@ -73,7 +73,6 @@ Welcome to ``acore_soap_app`` Documentation
 
 Install
 ------------------------------------------------------------------------------
-
 ``acore_soap_app`` is released on PyPI, so all you need is to:
 
 .. code-block:: console
@@ -85,3 +84,21 @@ To upgrade to latest version:
 .. code-block:: console
 
     $ pip install --upgrade acore-soap-app
+
+There are two installation mode, Agent mode and SDK mode.
+
+1. If you want to install ``acore_soap_app`` as an Agent on game server, you should install it in Agent mode. The dependency in Agent mode is deterministic (very restrict), so that it gives you a stable dependency layer for production.
+2. If you want to import and use some APIs in ``acore_soap_app``, you should install it in SDK mode. The dependency in SDK mode is loss.
+
+**App Mode**:
+
+.. code-block:: bash
+
+    $ pip install acore-soap-app
+
+**SDK Mode**:
+
+.. code-block:: bash
+
+    $ pip install acore-soap-app --no-deps
+    $ pip install -r /path/to/acore_soap_app-project/loss_req/requirements.txt
