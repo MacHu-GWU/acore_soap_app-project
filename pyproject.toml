@@ -4,7 +4,31 @@
 name = "acore_soap_app"
 version = "0.3.6"
 description = "Azerothcore World of Warcraft Soap Remote Access Python Library."
+license = "MIT"
 authors = ["Sanhe Hu <husanhe@gmail.com>"]
+maintainers = ["Sanhe Hu <husanhe@gmail.com>"]
+readme = "README.rst"
+homepage = "https://github.com/MacHu-GWU/acore_soap_app-project"
+documentation = "https://acore-soap-app.readthedocs.io/en/latest/"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[tool.poetry.scripts]
+acsoap = "acore_soap_app.cli.main:run"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0" # this is just for integration test purpose, it doesn't mean that we only support 3.8+
