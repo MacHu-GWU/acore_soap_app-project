@@ -1,0 +1,75 @@
+# this is just for integration test purpose, it is not used for publishing to PyPI, we use setup.py
+# for some manual test, you need to make a copy of this and rename it to ``pyproject.toml``
+[tool.poetry]
+name = "acore_soap_app"
+version = "0.3.5"
+description = "Azerothcore World of Warcraft Soap Remote Access Python Library."
+authors = ["Sanhe Hu <husanhe@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0" # this is just for integration test purpose, it doesn't mean that we only support 3.8+
+fire = ">=0.5.0,<1.0.0"
+requests = ">=2.20.0,<3.0.0"
+boto_session_manager = ">=1.7.2,<2.0.0"
+aws_ssm_run_command = ">=1.0.1,<2.0.0"
+simple_aws_ec2 = ">=0.8.1,<1.0.0"
+acore_constants = ">=0.2.1,<1.0.0"
+acore_server_metadata = ">=0.7.1,<2.0.0"
+# when you do ``pyops poetry-lock``, enable this line
+# when you do ``pyops install-all``, you don't need this line
+# https://github.com/python-poetry/poetry-plugin-export/issues/239
+urllib3 = ">=1.26.0,<2.0.0"
+
+# --- addtitional dependencies for development
+[tool.poetry.group.dev]
+optional = true
+
+
+[tool.poetry.group.dev.dependencies]
+pathlib_mate = "*" # path manipulation
+twine = "*" # make distribution archive
+wheel = "*" # make pre-compiled distribution package
+build = "*" # build distribution package
+
+
+# --- addtitional dependencies for building documentations
+[tool.poetry.group.doc]
+optional = true
+
+
+[tool.poetry.group.doc.dependencies]
+Sphinx = "5.3.0"
+sphinx-jinja = "2.0.2"
+sphinx-copybutton = "0.5.1"
+sphinx-design = "0.5.0"
+furo = "2023.03.27"
+nbsphinx = "0.8.12"
+rstobj = "1.2.1"
+pygments = "2.15.1"
+ipython = "8.10.0"
+docfly = "2.0.3"
+
+
+# --- addtitional dependencies for testing
+[tool.poetry.group.test]
+optional = true
+
+
+[tool.poetry.group.test.dependencies]
+pytest-cov = "*"
+pytest = "*"
+twine = "*"
+wheel = "*"
+build = "*"
+moto = ">=4.2.14,<5.0.0"
+rich = "*"
+
+# --- addtitional dependencies for automation shell scripts
+[tool.poetry.group.auto]
+optional = true
+
+[tool.poetry.group.auto.dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

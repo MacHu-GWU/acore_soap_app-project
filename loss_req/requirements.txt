@@ -1,0 +1,9 @@
+# Core dependencies goes here
+fire>=0.5.0,<1.0.0
+requests>=2.20.0,<3.0.0
+boto_session_manager>=1.7.2,<2.0.0
+aws_ssm_run_command>=1.0.1,<2.0.0
+simple_aws_ec2>=0.8.1,<1.0.0
+acore_constants>=0.2.1,<1.0.0
+acore_server_metadata>=0.7.1,<2.0.0
+urllib3>=1.26.0,<2.0.0
