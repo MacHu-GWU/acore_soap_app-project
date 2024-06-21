@@ -24,6 +24,9 @@
 .. image:: https://img.shields.io/badge/STAR_Me_on_GitHub!--None.svg?style=social
     :target: https://github.com/MacHu-GWU/acore_soap_app-project
 
+.. image:: https://img.shields.io/badge/Acore_Doc--None.svg?style=social&logo=readthedocs
+    :target: https://acore-doc.readthedocs.io/en/latest/
+
 ------
 
 .. image:: https://img.shields.io/badge/Link-Document-blue.svg
