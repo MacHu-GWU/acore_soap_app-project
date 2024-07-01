@@ -2,7 +2,7 @@
 # for some manual test, you need to make a copy of this and rename it to ``pyproject.toml``
 [tool.poetry]
 name = "acore_soap_app"
-version = "0.3.6"
+version = "0.3.7"
 description = "Azerothcore World of Warcraft Soap Remote Access Python Library."
 license = "MIT"
 authors = ["Sanhe Hu <husanhe@gmail.com>"]
