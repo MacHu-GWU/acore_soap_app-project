@@ -15,15 +15,20 @@ x.y.z (Backlog)
 **Miscellaneous**
 
 
+0.3.7 (2024-07-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Bugfixes**
+
+- Fix a bug that
+
+**Miscellaneous**
+
+
 0.3.6 (2024-06-20)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Minor Improvements**
 
-- Now this library has two installation mode, App mode and library mode.
-
-**Bugfixes**
-
-**Miscellaneous**
+- Fix a bug that the program may break when the soap response XML may have a empty results or faultstrings.
 
 
 0.3.5 (2023-06-18)

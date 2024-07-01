@@ -35,6 +35,7 @@ class Base:
     """
     Base class for :class:`SOAPRequest` and :class:`SOAPResponse`.
     """
+
     @classmethod
     def from_dict(cls, dct: dict):
         """
@@ -282,16 +283,26 @@ class SOAPResponse(Base):
         root = ET.fromstring(body)
         results = list(root.iter("result"))
         if len(results):
+            result = results[0]
+            if result.text:
+                message = result.text.strip()
+            else:
+                message = "No result"
             return cls(
                 body=body.strip(),
-                message=results[0].text.strip(),
+                message=message,
                 succeeded=True,
             )
         faultstrings = list(root.iter("faultstring"))
         if len(faultstrings):
+            faultstring = faultstrings[0]
+            if faultstring.text:
+                message = faultstring.text.strip()
+            else:
+                message = "No fault string"
             return cls(
                 body=body.strip(),
-                message=faultstrings[0].text.strip(),
+                message=message,
                 succeeded=False,
             )
 
